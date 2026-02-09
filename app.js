@@ -85,7 +85,7 @@ function renderQuizStep() {
     <h1 class="quiz-title">Perfil do Dono</h1>
     <h2>Grupo ${state.step + 1}</h2>
     <p class="helper">${groupMeta.title}</p>
-    <p class="order-hint">Topo = mais me identifico • Embaixo = menos me identifico.</p>
+    <p class="order-hint">Topo = mais me identifico</p>
     <ul id="sortable-list" class="sortable-list">
       ${groupItems
         .map(
@@ -103,6 +103,7 @@ function renderQuizStep() {
         )
         .join("")}
     </ul>
+    <p class="order-hint order-hint-bottom">Embaixo = menos me identifico</p>
   `;
 
   const listEl = document.getElementById("sortable-list");

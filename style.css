@@ -101,6 +101,10 @@ body {
   opacity: 0.95;
 }
 
+.order-hint-bottom {
+  margin-top: 8px;
+}
+
 .sortable-list {
   list-style: none;
   margin: 12px 0 0;
