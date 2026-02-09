@@ -41,7 +41,14 @@ body {
 
 .brand-block {
   display: grid;
-  gap: 4px;
+  gap: 6px;
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .brand {
@@ -72,7 +79,7 @@ body {
 }
 
 .mini-pill {
-  width: fit-content;
+  margin-left: auto;
   padding: 3px 8px;
   font-size: 0.68rem;
   opacity: 0.9;
@@ -255,10 +262,6 @@ input, select {
   .header {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .pill {
-    align-self: flex-start;
   }
 
   .mini-pill {
