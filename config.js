@@ -1,20 +1,46 @@
-const SUBMIT_URL = "https://script.google.com/macros/s/SEU_SCRIPT_ID/exec";
-const QUIZ_VERSION = "v1.0.0-ranking";
+// config.js
+export const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbwXkstNSE9hZAv5hWXcv2I-cgjhOeh7y6LePVFpUiwgV0ALuMwhJ4E52F-id02taEdL/exec";
+export const QUIZ_VERSION = "perfil-do-dono-ranking-v1";
 
-const SEGMENTS = [
-  "Tecnologia",
-  "Varejo",
-  "Serviços",
+export const SEGMENTS = [
+  "Restaurante / Food Service",
+  "Cafeteria / Padaria",
+  "Varejo (loja física)",
+  "E-commerce",
+  "Beleza (salão, estética, barbearia)",
+  "Saúde (clínica, consultório)",
+  "Odonto",
+  "Pet (clínica/petshop)",
+  "Academia / Fitness",
+  "Imobiliária / Corretagem",
+  "Construção / Arquitetura / Engenharia",
+  "Contabilidade / Jurídico / Serviços profissionais",
   "Indústria",
-  "Saúde",
-  "Educação",
-  "Alimentação",
-  "Financeiro",
-  "Marketing/Agência",
-  "Outro",
+  "Agro",
+  "Escola / Educação",
+  "Hotelaria / Turismo",
+  "Oficina / Auto",
+  "Outro (digitar)"
 ];
 
-const BEHAVIORS = [
+// 12 grupos x 4 adjetivos (1 D, 1 I, 1 S, 1 C por grupo)
+export const GROUPS = [
+  { id:"g1",  title:"Como você age sob pressão", items:["Decidido","Comunicativo","Calmo","Detalhista"] },
+  { id:"g2",  title:"Quando surge um problema", items:["Direto","Carismático","Paciente","Preciso"] },
+  { id:"g3",  title:"Seu jeito de tocar a rotina", items:["Acelerado","Entusiasmado","Constante","Organizado"] },
+  { id:"g4",  title:"Em mudanças e imprevistos", items:["Ousado","Flexível","Estável","Prudente"] },
+  { id:"g5",  title:"No comando do time", items:["Firme","Persuasivo","Empático","Racional"] },
+  { id:"g6",  title:"Na tomada de decisão", items:["Objetivo","Influente","Conciliador","Analítico"] },
+  { id:"g7",  title:"Em metas e resultados", items:["Competitivo","Motivador","Persistente","Disciplinado"] },
+  { id:"g8",  title:"No relacionamento diário", items:["Independente","Sociável","Leal","Metódico"] },
+  { id:"g9",  title:"No jeito de trabalhar", items:["Prático","Dinamico","Cooperativo","Controlador"] },
+  { id:"g10", title:"Com regras e padrões", items:["Mandão","Inspirador","Comedido","Criterioso"] },
+  { id:"g11", title:"Quando precisa vender uma ideia", items:["Corajoso","Convincente","Atencioso","Consistente"] },
+  { id:"g12", title:"Em execução e entrega", items:["Urgente","Extrovertido","Previsível","Planejador"] },
+];
+
+// 24 comportamentos oficiais (chaves para padronizar)
+export const BEHAVIORS = [
   "Persistência",
   "Planejamento",
   "Organização e controle",
@@ -41,67 +67,78 @@ const BEHAVIORS = [
   "Extroversão",
 ];
 
-const GROUPS = [
-  ["Objetivo", "Comunicativo", "Paciente", "Analítico"],
-  ["Ousado", "Empático", "Disciplinado", "Persuasivo"],
-  ["Prudente", "Dinâmico", "Conciliador", "Detalhista"],
-  ["Independente", "Carismático", "Estável", "Racional"],
-  ["Comandante", "Entusiasmado", "Organizado", "Flexível"],
-  ["Urgente", "Sociável", "Planejado", "Concentrado"],
-  ["Persistente", "Extrovertido", "Cooperativo", "Preciso"],
-  ["Assertivo", "Motivador", "Metódico", "Calmo"],
-  ["Firme", "Criativo", "Leal", "Criterioso"],
-  ["Competitivo", "Inspirador", "Cuidadoso", "Estruturado"],
-];
+// Mapa: adjetivo -> DISC + comportamentos (pesos)
+// Regra: disc forte (1.0) + behavior principal (1.0) + secundário (0.6) quando fizer sentido
+export const MAP = {
+  // Grupo 1
+  "Decidido":     { disc:{D:1.0}, behaviors:{ "Comando e firmeza":1.0, "Objetividade":0.6 } },
+  "Comunicativo": { disc:{I:1.0}, behaviors:{ "Sociabilidade":1.0, "Extroversão":0.6 } },
+  "Calmo":        { disc:{S:1.0}, behaviors:{ "Estabilidade":1.0, "Paciência":0.6 } },
+  "Detalhista":   { disc:{C:1.0}, behaviors:{ "Detalhismo":1.0, "Concentração e precisão":0.6 } },
 
-const MAP = {
-  Objetivo: { disc: "D", behaviors: ["Objetividade"] },
-  Comunicativo: { disc: "I", behaviors: ["Sociabilidade", "Extroversão"] },
-  Paciente: { disc: "S", behaviors: ["Paciência", "Estabilidade"] },
-  Analítico: { disc: "C", behaviors: ["Racionalidade", "Concentração e precisão"] },
+  // Grupo 2
+  "Direto":       { disc:{D:1.0}, behaviors:{ "Objetividade":1.0, "Comando e firmeza":0.6 } },
+  "Carismático":  { disc:{I:1.0}, behaviors:{ "Carisma":1.0, "Persuasão":0.6 } },
+  "Paciente":     { disc:{S:1.0}, behaviors:{ "Paciência":1.0, "Conciliação e consentimento":0.6 } },
+  "Preciso":      { disc:{C:1.0}, behaviors:{ "Concentração e precisão":1.0, "Detalhismo":0.6 } },
 
-  Ousado: { disc: "D", behaviors: ["Ousadia", "Dinamismo"] },
-  Empático: { disc: "S", behaviors: ["Empatia", "Conciliação e consentimento"] },
-  Disciplinado: { disc: "C", behaviors: ["Disciplina", "Organização e controle"] },
-  Persuasivo: { disc: "I", behaviors: ["Persuasão", "Carisma"] },
+  // Grupo 3
+  "Acelerado":    { disc:{D:1.0}, behaviors:{ "Senso de urgência":1.0, "Dinamismo":0.6 } },
+  "Entusiasmado": { disc:{I:1.0}, behaviors:{ "Entusiasmo e motivação":1.0, "Dinamismo":0.6 } },
+  "Constante":    { disc:{S:1.0}, behaviors:{ "Persistência":1.0, "Estabilidade":0.6 } },
+  "Organizado":   { disc:{C:1.0}, behaviors:{ "Organização e controle":1.0, "Planejamento":0.6 } },
 
-  Prudente: { disc: "C", behaviors: ["Prudência"] },
-  Dinâmico: { disc: "D", behaviors: ["Dinamismo", "Senso de urgência"] },
-  Conciliador: { disc: "S", behaviors: ["Conciliação e consentimento", "Empatia"] },
-  Detalhista: { disc: "C", behaviors: ["Detalhismo", "Concentração e precisão"] },
+  // Grupo 4
+  "Ousado":       { disc:{D:1.0}, behaviors:{ "Ousadia":1.0, "Independência":0.6 } },
+  "Flexível":     { disc:{I:1.0}, behaviors:{ "Flexibilidade com mudanças":1.0, "Entusiasmo e motivação":0.6 } },
+  "Estável":      { disc:{S:1.0}, behaviors:{ "Estabilidade":1.0, "Persistência":0.6 } },
+  "Prudente":     { disc:{C:1.0}, behaviors:{ "Prudência":1.0, "Racionalidade":0.6 } },
 
-  Independente: { disc: "D", behaviors: ["Independência"] },
-  Carismático: { disc: "I", behaviors: ["Carisma", "Entusiasmo e motivação"] },
-  Estável: { disc: "S", behaviors: ["Estabilidade"] },
-  Racional: { disc: "C", behaviors: ["Racionalidade", "Planejamento"] },
+  // Grupo 5
+  "Firme":        { disc:{D:1.0}, behaviors:{ "Comando e firmeza":1.0, "Senso de urgência":0.6 } },
+  "Persuasivo":   { disc:{I:1.0}, behaviors:{ "Persuasão":1.0, "Carisma":0.6 } },
+  "Empático":     { disc:{S:1.0}, behaviors:{ "Empatia":1.0, "Conciliação e consentimento":0.6 } },
+  "Racional":     { disc:{C:1.0}, behaviors:{ "Racionalidade":1.0, "Prudência":0.6 } },
 
-  Comandante: { disc: "D", behaviors: ["Comando e firmeza"] },
-  Entusiasmado: { disc: "I", behaviors: ["Entusiasmo e motivação", "Extroversão"] },
-  Organizado: { disc: "C", behaviors: ["Organização e controle", "Planejamento"] },
-  Flexível: { disc: "S", behaviors: ["Flexibilidade com mudanças"] },
+  // Grupo 6
+  "Objetivo":     { disc:{D:1.0}, behaviors:{ "Objetividade":1.0, "Senso de urgência":0.6 } },
+  "Influente":    { disc:{I:1.0}, behaviors:{ "Persuasão":1.0, "Sociabilidade":0.6 } },
+  "Conciliador":  { disc:{S:1.0}, behaviors:{ "Conciliação e consentimento":1.0, "Empatia":0.6 } },
+  "Analítico":    { disc:{C:1.0}, behaviors:{ "Planejamento":1.0, "Racionalidade":0.6 } },
 
-  Urgente: { disc: "D", behaviors: ["Senso de urgência", "Objetividade"] },
-  Sociável: { disc: "I", behaviors: ["Sociabilidade", "Extroversão"] },
-  Planejado: { disc: "C", behaviors: ["Planejamento", "Disciplina"] },
-  Concentrado: { disc: "C", behaviors: ["Concentração e precisão", "Detalhismo"] },
+  // Grupo 7
+  "Competitivo":  { disc:{D:1.0}, behaviors:{ "Comando e firmeza":1.0, "Senso de urgência":0.6 } },
+  "Motivador":    { disc:{I:1.0}, behaviors:{ "Entusiasmo e motivação":1.0, "Carisma":0.6 } },
+  "Persistente":  { disc:{S:1.0}, behaviors:{ "Persistência":1.0, "Estabilidade":0.6 } },
+  "Disciplinado": { disc:{C:1.0}, behaviors:{ "Disciplina":1.0, "Organização e controle":0.6 } },
 
-  Persistente: { disc: "D", behaviors: ["Persistência"] },
-  Extrovertido: { disc: "I", behaviors: ["Extroversão", "Carisma"] },
-  Cooperativo: { disc: "S", behaviors: ["Conciliação e consentimento", "Empatia"] },
-  Preciso: { disc: "C", behaviors: ["Concentração e precisão", "Detalhismo"] },
+  // Grupo 8
+  "Independente": { disc:{D:1.0}, behaviors:{ "Independência":1.0, "Ousadia":0.6 } },
+  "Sociável":     { disc:{I:1.0}, behaviors:{ "Sociabilidade":1.0, "Extroversão":0.6 } },
+  "Leal":         { disc:{S:1.0}, behaviors:{ "Estabilidade":1.0, "Persistência":0.6 } },
+  "Metódico":     { disc:{C:1.0}, behaviors:{ "Organização e controle":1.0, "Disciplina":0.6 } },
 
-  Assertivo: { disc: "D", behaviors: ["Comando e firmeza", "Objetividade"] },
-  Motivador: { disc: "I", behaviors: ["Entusiasmo e motivação", "Persuasão"] },
-  Metódico: { disc: "C", behaviors: ["Planejamento", "Disciplina"] },
-  Calmo: { disc: "S", behaviors: ["Paciência", "Estabilidade"] },
+  // Grupo 9
+  "Prático":      { disc:{D:1.0}, behaviors:{ "Objetividade":1.0, "Senso de urgência":0.6 } },
+  "Dinamico":     { disc:{I:1.0}, behaviors:{ "Dinamismo":1.0, "Entusiasmo e motivação":0.6 } },
+  "Cooperativo":  { disc:{S:1.0}, behaviors:{ "Empatia":1.0, "Conciliação e consentimento":0.6 } },
+  "Controlador":  { disc:{C:1.0}, behaviors:{ "Organização e controle":1.0, "Detalhismo":0.6 } },
 
-  Firme: { disc: "D", behaviors: ["Comando e firmeza", "Persistência"] },
-  Criativo: { disc: "I", behaviors: ["Dinamismo", "Ousadia"] },
-  Leal: { disc: "S", behaviors: ["Estabilidade", "Empatia"] },
-  Criterioso: { disc: "C", behaviors: ["Prudência", "Racionalidade"] },
+  // Grupo 10
+  "Mandão":       { disc:{D:1.0}, behaviors:{ "Comando e firmeza":1.0, "Independência":0.6 } },
+  "Inspirador":   { disc:{I:1.0}, behaviors:{ "Carisma":1.0, "Entusiasmo e motivação":0.6 } },
+  "Comedido":     { disc:{S:1.0}, behaviors:{ "Paciência":1.0, "Estabilidade":0.6 } },
+  "Criterioso":   { disc:{C:1.0}, behaviors:{ "Prudência":1.0, "Concentração e precisão":0.6 } },
 
-  Competitivo: { disc: "D", behaviors: ["Ousadia", "Independência"] },
-  Inspirador: { disc: "I", behaviors: ["Carisma", "Persuasão"] },
-  Cuidadoso: { disc: "S", behaviors: ["Prudência", "Paciência"] },
-  Estruturado: { disc: "C", behaviors: ["Organização e controle", "Detalhismo"] },
+  // Grupo 11
+  "Corajoso":     { disc:{D:1.0}, behaviors:{ "Ousadia":1.0, "Independência":0.6 } },
+  "Convincente":  { disc:{I:1.0}, behaviors:{ "Persuasão":1.0, "Carisma":0.6 } },
+  "Atencioso":    { disc:{S:1.0}, behaviors:{ "Empatia":1.0, "Sociabilidade":0.6 } },
+  "Consistente":  { disc:{C:1.0}, behaviors:{ "Disciplina":1.0, "Planejamento":0.6 } },
+
+  // Grupo 12
+  "Urgente":      { disc:{D:1.0}, behaviors:{ "Senso de urgência":1.0, "Dinamismo":0.6 } },
+  "Extrovertido": { disc:{I:1.0}, behaviors:{ "Extroversão":1.0, "Sociabilidade":0.6 } },
+  "Previsível":   { disc:{S:1.0}, behaviors:{ "Estabilidade":1.0, "Organização e controle":0.6 } },
+  "Planejador":   { disc:{C:1.0}, behaviors:{ "Planejamento":1.0, "Organização e controle":0.6 } },
 };
