@@ -1,6 +1,8 @@
+import { BEHAVIORS, GROUPS, MAP, QUIZ_VERSION, SEGMENTS, SUBMIT_URL } from "./config.js";
+
 const state = {
   step: 0,
-  rankings: GROUPS.map((group) => [...group]),
+  rankings: GROUPS.map((group) => [...group.items]),
   result: null,
 };
 
@@ -14,10 +16,11 @@ const progressFill = document.getElementById("progress-fill");
 let sortableInstance;
 
 function renderQuizStep() {
+  const groupMeta = GROUPS[state.step];
   const groupItems = state.rankings[state.step];
   quizView.innerHTML = `
     <h2>Grupo ${state.step + 1}</h2>
-    <p class="helper">1º = mais representa · 4º = menos representa</p>
+    <p class="helper">${groupMeta.title}</p>
     <ul id="sortable-list" class="sortable-list">
       ${groupItems
         .map(
@@ -68,13 +71,8 @@ function currentStepValid() {
 
 function updateButtons() {
   btnBack.disabled = state.step === 0;
-  if (state.step < GROUPS.length - 1) {
-    btnNext.textContent = "Próximo";
-    btnNext.disabled = !currentStepValid();
-  } else {
-    btnNext.textContent = "Ver resultado";
-    btnNext.disabled = !currentStepValid();
-  }
+  btnNext.textContent = state.step < GROUPS.length - 1 ? "Próximo" : "Ver resultado";
+  btnNext.disabled = !currentStepValid();
 }
 
 function normalizePercent(raw) {
@@ -104,9 +102,13 @@ function calculateResults() {
       const points = positionPoints[idx];
       const map = MAP[item];
       if (!map) return;
-      discRaw[map.disc] += points;
-      map.behaviors.forEach((behavior) => {
-        behaviorRaw[behavior] = (behaviorRaw[behavior] || 0) + points;
+
+      Object.entries(map.disc).forEach(([disc, weight]) => {
+        discRaw[disc] += points * weight;
+      });
+
+      Object.entries(map.behaviors).forEach(([behavior, weight]) => {
+        behaviorRaw[behavior] = (behaviorRaw[behavior] || 0) + points * weight;
       });
     });
   });
@@ -132,10 +134,10 @@ function renderResult() {
 
   const disc = state.result.disc_pct;
   const top = state.result.behaviors_top
-    .map((b, i) => `<li>${i + 1}. ${b.name} <strong>(${b.score})</strong></li>`)
+    .map((b, i) => `<li>${i + 1}. ${b.name} <strong>(${b.score.toFixed(1)})</strong></li>`)
     .join("");
   const bottom = state.result.behaviors_bottom
-    .map((b, i) => `<li>${i + 1}. ${b.name} <strong>(${b.score})</strong></li>`)
+    .map((b, i) => `<li>${i + 1}. ${b.name} <strong>(${b.score.toFixed(1)})</strong></li>`)
     .join("");
 
   resultView.innerHTML = `
