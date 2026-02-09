@@ -69,6 +69,12 @@ body {
 .subtitle, .helper { color: var(--muted); }
 .subtitle { margin: 8px 0 0; }
 
+.quiz-title {
+  margin: 0 0 12px;
+  font-size: clamp(1.5rem, 5vw, 2.1rem);
+  white-space: nowrap;
+}
+
 .sortable-list {
   list-style: none;
   margin: 12px 0 0;
@@ -83,10 +89,32 @@ body {
   border-radius: 12px;
   padding: 14px;
   display: grid;
-  grid-template-columns: 42px 1fr 24px;
+  grid-template-columns: 42px 1fr auto;
   align-items: center;
   gap: 8px;
   font-size: 1rem;
+}
+
+.item-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.move-btn {
+  border: 1px solid var(--border);
+  background: #2c372c;
+  color: var(--text);
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.move-btn:active {
+  transform: translateY(1px);
 }
 
 .rank {
@@ -212,5 +240,9 @@ input, select {
 
   .pill {
     align-self: flex-start;
+  }
+
+  .quiz-title {
+    font-size: 1.9rem;
   }
 }

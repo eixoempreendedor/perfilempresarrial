@@ -82,6 +82,7 @@ function renderQuizStep() {
   const groupMeta = GROUPS[state.step];
   const groupItems = state.rankings[state.step];
   quizView.innerHTML = `
+    <h1 class="quiz-title">Perfil do Dono</h1>
     <h2>Grupo ${state.step + 1}</h2>
     <p class="helper">${groupMeta.title}</p>
     <ul id="sortable-list" class="sortable-list">
@@ -91,7 +92,11 @@ function renderQuizStep() {
             <li class="drag-item" data-item="${item}">
               <span class="rank">${idx + 1}º</span>
               <span>${item}</span>
-              <span class="drag-handle">☰</span>
+              <div class="item-controls">
+                <button class="move-btn" type="button" data-move="up" aria-label="Mover para cima">↑</button>
+                <button class="move-btn" type="button" data-move="down" aria-label="Mover para baixo">↓</button>
+                <span class="drag-handle" aria-hidden="true">☰</span>
+              </div>
             </li>
           `
         )
@@ -106,6 +111,26 @@ function renderQuizStep() {
     ghostClass: "drag-ghost",
     handle: ".drag-handle",
     onEnd: saveCurrentOrder,
+  });
+
+  listEl.addEventListener("click", (event) => {
+    const button = event.target.closest(".move-btn");
+    if (!button) return;
+
+    const item = button.closest(".drag-item");
+    if (!item) return;
+
+    const move = button.dataset.move;
+    if (move === "up" && item.previousElementSibling) {
+      listEl.insertBefore(item, item.previousElementSibling);
+      saveCurrentOrder();
+      return;
+    }
+
+    if (move === "down" && item.nextElementSibling) {
+      listEl.insertBefore(item.nextElementSibling, item);
+      saveCurrentOrder();
+    }
   });
 
   updateProgress();
