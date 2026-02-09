@@ -39,6 +39,11 @@ body {
   gap: 12px;
 }
 
+.brand-block {
+  display: grid;
+  gap: 4px;
+}
+
 .brand {
   margin: 0;
   display: inline-flex;
@@ -66,6 +71,13 @@ body {
   white-space: nowrap;
 }
 
+.mini-pill {
+  width: fit-content;
+  padding: 3px 8px;
+  font-size: 0.68rem;
+  opacity: 0.9;
+}
+
 .subtitle, .helper { color: var(--muted); }
 .subtitle { margin: 8px 0 0; }
 
@@ -73,6 +85,13 @@ body {
   margin: 0 0 12px;
   font-size: clamp(1.5rem, 5vw, 2.1rem);
   white-space: nowrap;
+}
+
+.order-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--muted);
+  opacity: 0.95;
 }
 
 .sortable-list {
@@ -242,7 +261,15 @@ input, select {
     align-self: flex-start;
   }
 
+  .mini-pill {
+    font-size: 0.63rem;
+  }
+
   .quiz-title {
     font-size: 1.9rem;
+  }
+
+  .order-hint {
+    font-size: 0.68rem;
   }
 }
