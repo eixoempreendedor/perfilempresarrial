@@ -1,5 +1,68 @@
 import { BEHAVIORS, GROUPS, MAP, QUIZ_VERSION, SEGMENTS, SUBMIT_URL } from "./config.js";
 
+const PROFILE_GUIDE = {
+  D: {
+    label: "Direto",
+    headline: "Direto e destravador",
+    work: ["Você gosta de decidir, destravar e cobrar avanço."],
+    strengths: [
+      "Use sua velocidade para tirar gargalos do time.",
+      "Defina metas claras e checkpoints curtos para manter tração.",
+      "Canalize sua objetividade para decisões difíceis.",
+    ],
+    risks: ["Atropelar pessoas", "Impaciência", "Pular etapa"],
+    tips: [
+      "1 meta/semana",
+      "Expectativas por escrito",
+      "1 conversa difícil marcada",
+    ],
+  },
+  I: {
+    label: "Comunicador",
+    headline: "Comunicador e mobilizador",
+    work: ["Você mobiliza, vende ideia, cria energia."],
+    strengths: [
+      "Use sua influência para alinhar time e clientes com clareza.",
+      "Aproveite seu carisma para acelerar adesão a mudanças.",
+      "Transforme reuniões em decisões com próximos passos definidos.",
+    ],
+    risks: ["Dispersar", "Prometer demais", "Faltar rotina"],
+    tips: ["3 prioridades/dia", "Checklist curto", "Fechar próxima ação"],
+  },
+  S: {
+    label: "Constante",
+    headline: "Constante e confiável",
+    work: ["Você sustenta o jogo, segura a operação, dá estabilidade."],
+    strengths: [
+      "Use sua consistência para criar previsibilidade na operação.",
+      "Consolide processos que reduzam retrabalho e ruído.",
+      "Apoie o time com acompanhamento próximo e calmo.",
+    ],
+    risks: ["Evitar conflito", "Demorar pra mudar", "Aceitar demais"],
+    tips: [
+      "Marcar conversas com data",
+      "Combinar limites",
+      "1 melhoria/semana",
+    ],
+  },
+  C: {
+    label: "Analítico",
+    headline: "Analítico e orientado a qualidade",
+    work: ["Você decide com fatos, organiza e melhora qualidade."],
+    strengths: [
+      "Use dados para priorizar o que mais impacta resultado.",
+      "Transforme seu padrão de qualidade em rotina simples para o time.",
+      "Documente critérios para decisões repetíveis.",
+    ],
+    risks: ["Perfeccionismo", "Demora", "Controle excessivo"],
+    tips: [
+      "Prazo + bom o suficiente",
+      "Critério de decisão",
+      "Revisão rápida",
+    ],
+  },
+};
+
 const state = {
   step: 0,
   rankings: GROUPS.map((group) => [...group.items]),
@@ -122,9 +185,14 @@ function calculateResults() {
     disc_pct: discPct,
     primary: discSorted[0][0],
     secondary: discSorted[1][0],
+    behaviors_scores: behaviorRaw,
     behaviors_top: behaviorSorted.slice(0, 8).map(([name, score]) => ({ name, score })),
     behaviors_bottom: behaviorSorted.slice(-6).map(([name, score]) => ({ name, score })),
   };
+}
+
+function listItems(items) {
+  return items.map((item) => `<li>${item}</li>`).join("");
 }
 
 function renderResult() {
@@ -133,11 +201,13 @@ function renderResult() {
   resultView.classList.remove("hidden");
 
   const disc = state.result.disc_pct;
+  const primaryGuide = PROFILE_GUIDE[state.result.primary];
+  const secondaryGuide = PROFILE_GUIDE[state.result.secondary];
   const top = state.result.behaviors_top
-    .map((b, i) => `<li>${i + 1}. ${b.name} <strong>(${b.score.toFixed(1)})</strong></li>`)
+    .map((b) => `<li>${b.name} <strong>(${b.score.toFixed(1)})</strong></li>`)
     .join("");
   const bottom = state.result.behaviors_bottom
-    .map((b, i) => `<li>${i + 1}. ${b.name} <strong>(${b.score.toFixed(1)})</strong></li>`)
+    .map((b) => `<li>${b.name} <strong>(${b.score.toFixed(1)})</strong></li>`)
     .join("");
 
   resultView.innerHTML = `
@@ -148,30 +218,75 @@ function renderResult() {
       <div><span>S</span><strong>${disc.S}%</strong></div>
       <div><span>C</span><strong>${disc.C}%</strong></div>
     </div>
-    <p><strong>Primário:</strong> ${state.result.primary} · <strong>Secundário:</strong> ${state.result.secondary}</p>
 
-    <h3>Top 8 comportamentos</h3>
+    <section class="card-soft profile-summary">
+      <h3>Seu Perfil</h3>
+      <p><strong>Primário:</strong> ${state.result.primary} — ${primaryGuide.label} · ${primaryGuide.headline}</p>
+      <p><strong>Secundário:</strong> ${state.result.secondary} — ${secondaryGuide.label} · ${secondaryGuide.headline}</p>
+    </section>
+
+    <section class="card-soft">
+      <h3>Como você trabalha</h3>
+      <ul>${listItems(primaryGuide.work)}</ul>
+      <p class="helper">Seu secundário ${state.result.secondary} (${secondaryGuide.label}) entra como apoio para equilibrar decisões e execução.</p>
+    </section>
+
+    <section class="card-soft">
+      <h3>Como usar isso a seu favor</h3>
+      <ul>${listItems(primaryGuide.strengths)}</ul>
+    </section>
+
+    <section class="card-soft">
+      <h3>Riscos</h3>
+      <ul>${listItems(primaryGuide.risks)}</ul>
+    </section>
+
+    <section class="card-soft">
+      <h3>Ajustes práticos</h3>
+      <ul>${listItems(primaryGuide.tips)}</ul>
+    </section>
+
+    <h3>Você se destaca nestes 8 comportamentos!</h3>
     <ol>${top}</ol>
 
-    <h3>Bottom 6 comportamentos</h3>
+    <h3>Precisamos trabalhar estes aqui para melhorar ainda mais o seu desempenho</h3>
     <ol>${bottom}</ol>
 
-    <h3>Receber resultado completo</h3>
-    <form id="lead-form" class="lead-form">
-      <label>Nome<input required name="name" /></label>
-      <label>Email<input required type="email" name="email" /></label>
-      <label>WhatsApp<input required name="whatsapp" /></label>
-      <label>Empresa<input required name="company" /></label>
-      <label>Segmento
-        <select required name="segment">
-          <option value="" disabled selected>Selecione...</option>
-          ${SEGMENTS.map((s) => `<option value="${s}">${s}</option>`).join("")}
-        </select>
-      </label>
-      <button class="btn primary full" type="submit">Enviar</button>
-      <p id="submit-feedback" class="feedback"></p>
-    </form>
+    <section class="card-soft cta-plan">
+      <h3>Plano personalizado por segmento</h3>
+      <p>Se você quiser, eu monto um plano prático pro seu segmento (rotina, foco da semana e ajustes do seu perfil) e te envio.</p>
+      <form id="lead-form" class="lead-form">
+        <label>Nome<input name="name" /></label>
+        <label>Email<input type="email" name="email" /></label>
+        <label>WhatsApp<input name="whatsapp" /></label>
+        <label>Empresa<input required name="company" /></label>
+        <label>Segmento
+          <select required name="segment_select" id="segment-select">
+            <option value="" disabled selected>Selecione...</option>
+            ${SEGMENTS.map((s) => `<option value="${s}">${s}</option>`).join("")}
+          </select>
+        </label>
+        <label id="segment-other-wrap" class="hidden">Outro segmento
+          <input name="segment_other" id="segment-other" />
+        </label>
+        <input class="hidden" tabindex="-1" autocomplete="off" name="website" />
+        <label class="consent-line"><input type="checkbox" name="consent" value="sim" required /> Eu concordo em receber o plano personalizado e comunicações relacionadas.</label>
+        <button id="plan-submit" class="btn primary full" type="submit">Quero meu plano personalizado</button>
+        <p id="submit-feedback" class="feedback"></p>
+      </form>
+    </section>
   `;
+
+  const segmentSelect = document.getElementById("segment-select");
+  const segmentOtherWrap = document.getElementById("segment-other-wrap");
+  const segmentOtherInput = document.getElementById("segment-other");
+
+  segmentSelect.addEventListener("change", () => {
+    const isOther = segmentSelect.value === "Outro (digitar)";
+    segmentOtherWrap.classList.toggle("hidden", !isOther);
+    segmentOtherInput.required = isOther;
+    if (!isOther) segmentOtherInput.value = "";
+  });
 
   document.getElementById("lead-form").addEventListener("submit", submitLead);
 
@@ -185,18 +300,53 @@ function renderResult() {
 async function submitLead(event) {
   event.preventDefault();
   const feedback = document.getElementById("submit-feedback");
+  const submitButton = document.getElementById("plan-submit");
   const formData = new FormData(event.target);
   const lead = Object.fromEntries(formData.entries());
 
+  const finalSegment = lead.segment_select === "Outro (digitar)"
+    ? (lead.segment_other || "").trim()
+    : lead.segment_select;
+
+  if (!lead.company?.trim()) {
+    feedback.textContent = "Informe a empresa para receber o plano.";
+    return;
+  }
+
+  if (!finalSegment) {
+    feedback.textContent = "Selecione o segmento (ou informe em Outro).";
+    return;
+  }
+
+  if (!lead.email?.trim() && !lead.whatsapp?.trim()) {
+    feedback.textContent = "Informe email ou WhatsApp para contato.";
+    return;
+  }
+
+  if (lead.consent !== "sim") {
+    feedback.textContent = "Você precisa autorizar o contato para receber o plano.";
+    return;
+  }
+
   const payload = {
-    quiz_version: QUIZ_VERSION,
-    ranking_json: state.result.ranking_json,
-    disc_pct: state.result.disc_pct,
+    nome: (lead.name || "").trim(),
+    email: (lead.email || "").trim(),
+    whatsapp: (lead.whatsapp || "").trim(),
+    empresa: lead.company.trim(),
+    segmento: finalSegment,
+    consent: lead.consent,
     primary: state.result.primary,
     secondary: state.result.secondary,
-    behaviors_top: state.result.behaviors_top,
-    behaviors_bottom: state.result.behaviors_bottom,
-    ...lead,
+    pct: state.result.disc_pct,
+    ranking_json: state.result.ranking_json,
+    behaviors_json: state.result.behaviors_scores,
+    behaviorsTop: state.result.behaviors_top.map((item) => item.name),
+    behaviorsBottom: state.result.behaviors_bottom.map((item) => item.name),
+    pageUrl: window.location.href,
+    referrer: document.referrer || "",
+    userAgent: navigator.userAgent,
+    quizVersion: QUIZ_VERSION,
+    website: lead.website || "",
     submitted_at: new Date().toISOString(),
   };
 
@@ -209,8 +359,8 @@ async function submitLead(event) {
     });
 
     if (!response.ok) throw new Error("Falha no envio");
-    feedback.textContent = "Enviado com sucesso!";
-    event.target.reset();
+    feedback.textContent = "Recebido ✅ vou te enviar em breve.";
+    submitButton.disabled = true;
   } catch (error) {
     feedback.textContent = "Não foi possível enviar agora. Tente novamente.";
   }
