@@ -1,4 +1,6 @@
-# Perfil do Dono — Ranking Drag & Drop
+# perfil.empresarial
+
+> App: Perfil do Dono — Ranking Drag & Drop
 
 App web estático (HTML/CSS/JS) para quiz de perfil com ordenação por arrastar e cálculo DISC + comportamentos.
 
