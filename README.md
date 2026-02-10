@@ -22,6 +22,15 @@ Edite `config.js` para ajustar:
 - `QUIZ_VERSION`: versão do quiz enviada no payload.
 - `SEGMENTS`, `GROUPS` e `MAP` conforme necessidade.
 
+## Melhorias implementadas
+
+- Progresso com estimativa dinâmica de tempo restante.
+- Retomada de sessão via `localStorage` para evitar perda de progresso.
+- Eventos de funil (início, visualização/conclusão de grupos, resultado, submit).
+- Validação por campo no formulário final (email/WhatsApp/segmento/consentimento).
+- Honeypot anti-bot (`website`) com bloqueio silencioso.
+- Envio com timeout + retry e fallback para payload pendente em `localStorage`.
+
 ## Deploy no GitHub Pages
 
 1. Suba os arquivos no repositório (branch `main`).
@@ -36,12 +45,13 @@ Edite `config.js` para ajustar:
 
 No envio final, o app faz `fetch POST` para `SUBMIT_URL` com JSON contendo:
 
-- `ranking_json`
-- `disc_pct`
-- `primary`
-- `secondary`
-- `behaviors_top`
-- `behaviors_bottom`
-- dados do lead (`name`, `email`, `whatsapp`, `company`, `segment`)
-- `quiz_version`
-- `submitted_at`
+- contrato principal:
+  - `name`, `email`, `whatsapp`, `company`, `segment`, `consent`
+  - `ranking_json`, `disc_pct`, `primary`, `secondary`
+  - `behaviors_scores`, `behaviors_top`, `behaviors_bottom`
+  - `quiz_version`, `submitted_at`
+  - `page_url`, `referrer`, `user_agent`
+  - `quiz_events`, `group_timings_ms`
+- compatibilidade legada:
+  - `nome`, `empresa`, `segmento`, `pct`, `behaviors_json`
+  - `behaviorsTop`, `behaviorsBottom`, `pageUrl`, `userAgent`, `quizVersion`

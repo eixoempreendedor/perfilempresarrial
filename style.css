@@ -7,6 +7,7 @@
   --primary: #43a047;
   --primary-dark: #2e7d32;
   --border: #314131;
+  --danger: #ff7f7f;
 }
 
 * { box-sizing: border-box; }
@@ -274,6 +275,16 @@ input, select {
   border-radius: 10px;
   background: #111911;
   color: var(--text);
+}
+
+.input-error {
+  border-color: #b84a4a;
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: 0.78rem;
+  min-height: 14px;
 }
 
 .feedback { color: var(--muted); min-height: 18px; }
