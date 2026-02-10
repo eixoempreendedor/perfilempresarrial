@@ -158,7 +158,7 @@ function renderQuizStep() {
   quizView.innerHTML = `
     <h2 class="group-heading">Grupo ${state.step + 1}</h2>
     <p class="group-orientation">
-      <span class="orientation-prefix">Como você age | se comporta | se sente</span>
+      <span class="orientation-prefix">Como você age, se comporta ou se sente</span>
       <span class="orientation-question">${orientationQuestion}</span>
     </p>
     <p class="order-hint">Topo = mais me identifico</p>
