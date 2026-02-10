@@ -353,10 +353,10 @@ function renderResult() {
   const primaryGuide = PROFILE_GUIDE[state.result.primary];
   const secondaryGuide = PROFILE_GUIDE[state.result.secondary];
   const top = state.result.behaviors_top
-    .map((b) => `<li>${b.name} <strong>(${b.score.toFixed(1)})</strong></li>`)
+    .map((b) => `<li>${b.name}</li>`)
     .join("");
   const bottom = state.result.behaviors_bottom
-    .map((b) => `<li>${b.name} <strong>(${b.score.toFixed(1)})</strong></li>`)
+    .map((b) => `<li>${b.name}</li>`)
     .join("");
 
   resultView.innerHTML = `
