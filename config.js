@@ -25,18 +25,18 @@ export const SEGMENTS = [
 
 // 12 grupos x 4 adjetivos (1 D, 1 I, 1 S, 1 C por grupo)
 export const GROUPS = [
-  { id:"g1",  title:"Como você age sob pressão", items:["Decidido","Comunicativo","Calmo","Detalhista"] },
-  { id:"g2",  title:"Quando surge um problema", items:["Direto","Carismático","Paciente","Preciso"] },
-  { id:"g3",  title:"Seu jeito de tocar a rotina", items:["Acelerado","Entusiasmado","Constante","Organizado"] },
-  { id:"g4",  title:"Em mudanças e imprevistos", items:["Ousado","Flexível","Estável","Prudente"] },
-  { id:"g5",  title:"No comando do time", items:["Firme","Persuasivo","Empático","Racional"] },
-  { id:"g6",  title:"Na tomada de decisão", items:["Objetivo","Influente","Conciliador","Analítico"] },
-  { id:"g7",  title:"Em metas e resultados", items:["Competitivo","Motivador","Persistente","Disciplinado"] },
-  { id:"g8",  title:"No relacionamento diário", items:["Independente","Sociável","Leal","Metódico"] },
-  { id:"g9",  title:"No jeito de trabalhar", items:["Prático","Dinamico","Cooperativo","Controlador"] },
-  { id:"g10", title:"Com regras e padrões", items:["Mandão","Inspirador","Comedido","Criterioso"] },
-  { id:"g11", title:"Quando precisa vender uma ideia", items:["Corajoso","Convincente","Atencioso","Consistente"] },
-  { id:"g12", title:"Em execução e entrega", items:["Urgente","Extrovertido","Previsível","Planejador"] },
+  { id:"g1",  title:"sobre pressão", items:["Decidido","Comunicativo","Calmo","Detalhista"] },
+  { id:"g2",  title:"quando surge um problema", items:["Direto","Carismático","Paciente","Preciso"] },
+  { id:"g3",  title:"em sua rotina", items:["Acelerado","Entusiasmado","Constante","Organizado"] },
+  { id:"g4",  title:"com mudanças e imprevistos", items:["Ousado","Flexível","Estável","Prudente"] },
+  { id:"g5",  title:"ao comando do time", items:["Firme","Persuasivo","Empático","Racional"] },
+  { id:"g6",  title:"para tomada de decisão", items:["Objetivo","Influente","Conciliador","Analítico"] },
+  { id:"g7",  title:"com metas e resultados", items:["Competitivo","Motivador","Persistente","Disciplinado"] },
+  { id:"g8",  title:"no relacionamento diário", items:["Independente","Sociável","Leal","Metódico"] },
+  { id:"g9",  title:"no jeito de trabalhar", items:["Prático","Dinamico","Cooperativo","Controlador"] },
+  { id:"g10", title:"com regras e padrões", items:["Mandão","Inspirador","Comedido","Criterioso"] },
+  { id:"g11", title:"quando precisa vender uma ideia", items:["Corajoso","Convincente","Atencioso","Consistente"] },
+  { id:"g12", title:"na execução e entrega", items:["Urgente","Extrovertido","Previsível","Planejador"] },
 ];
 
 // 24 comportamentos oficiais (chaves para padronizar)
