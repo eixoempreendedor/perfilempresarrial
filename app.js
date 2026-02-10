@@ -1,6 +1,7 @@
 import { BEHAVIORS, GROUPS, MAP, QUIZ_VERSION, SEGMENTS, SUBMIT_URL } from "./config.js";
 
 const STORAGE_KEY = "perfil-do-dono-state";
+const PENDING_SUBMIT_KEY = `${STORAGE_KEY}-pending-submit`;
 const AVG_GROUP_SECONDS = 14;
 
 const PROFILE_GUIDE = {
@@ -494,7 +495,7 @@ function renderResult() {
   clearPersistedState();
 }
 
-async function fetchWithRetry(url, options, { timeoutMs = 10000, retries = 1 } = {}) {
+async function fetchWithRetry(url, options, { timeoutMs = 10000, retries = 1, acceptOpaqueResponse = false } = {}) {
   let attempt = 0;
   while (attempt <= retries) {
     const controller = new AbortController();
@@ -502,7 +503,12 @@ async function fetchWithRetry(url, options, { timeoutMs = 10000, retries = 1 } =
     try {
       const response = await fetch(url, { ...options, signal: controller.signal });
       clearTimeout(timer);
-      if (!response.ok) throw new Error("Falha no envio");
+      if (!response.ok) {
+        if (acceptOpaqueResponse && response.type === "opaque") {
+          return response;
+        }
+        throw new Error("Falha no envio");
+      }
       return response;
     } catch (error) {
       clearTimeout(timer);
@@ -510,6 +516,50 @@ async function fetchWithRetry(url, options, { timeoutMs = 10000, retries = 1 } =
       await new Promise((resolve) => setTimeout(resolve, 400 * 2 ** attempt));
       attempt += 1;
     }
+  }
+}
+
+async function postLead(payload) {
+  const serializedPayload = JSON.stringify(payload);
+
+  try {
+    await fetchWithRetry(
+      SUBMIT_URL,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: serializedPayload,
+      },
+      { timeoutMs: 15000, retries: 1 }
+    );
+    return;
+  } catch {
+    await fetchWithRetry(
+      SUBMIT_URL,
+      {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: serializedPayload,
+      },
+      { timeoutMs: 15000, retries: 1, acceptOpaqueResponse: true }
+    );
+  }
+}
+
+async function flushPendingSubmit() {
+  const rawPendingSubmit = localStorage.getItem(PENDING_SUBMIT_KEY);
+  if (!rawPendingSubmit) return;
+
+  try {
+    const pendingPayload = JSON.parse(rawPendingSubmit);
+    await postLead(pendingPayload);
+    localStorage.removeItem(PENDING_SUBMIT_KEY);
+    trackEvent("lead_submit_pending_flushed", {
+      segment: pendingPayload.segment || pendingPayload.segmento || "",
+    });
+  } catch {
+    trackEvent("lead_submit_pending_flush_failed", {});
   }
 }
 
@@ -620,21 +670,17 @@ async function submitLead(event) {
   });
 
   try {
-    await fetchWithRetry(
-      SUBMIT_URL,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      },
-      { timeoutMs: 10000, retries: 1 }
-    );
+    await postLead(payload);
 
     feedback.textContent = "Recebido ✅ vou te enviar em breve.";
     submitButton.disabled = true;
+    localStorage.removeItem(PENDING_SUBMIT_KEY);
     trackEvent("lead_submit_success", { segment: finalSegment });
   } catch {
-    localStorage.setItem(`${STORAGE_KEY}-pending-submit`, JSON.stringify(payload));
+    localStorage.setItem(PENDING_SUBMIT_KEY, JSON.stringify(payload));
+    setTimeout(() => {
+      void flushPendingSubmit();
+    }, 15000);
     feedback.textContent = "Não foi possível enviar agora. Tentamos novamente em instantes. Se persistir, atualize e tente de novo.";
     trackEvent("lead_submit_failed", { segment: finalSegment });
   }
@@ -672,5 +718,8 @@ btnNext.addEventListener("click", () => {
 });
 
 const hasSavedSession = loadState();
+setTimeout(() => {
+  void flushPendingSubmit();
+}, 2000);
 trackEvent("quiz_started", { resumed: hasSavedSession });
 renderQuizStep();
