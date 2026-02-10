@@ -58,6 +58,17 @@ const state = {
   step: 0,
   rankings: GROUPS.map((group) => [...group.items]),
   result: null,
+  lead: {
+    name: "",
+    email: "",
+    whatsapp: "",
+    company: "",
+    segment_select: "",
+    segment_other: "",
+    cidade_uf: "",
+    website: "",
+    consent: "",
+  },
   startedAt: Date.now(),
   groupEnteredAt: Date.now(),
   groupTimingsMs: {},
@@ -149,6 +160,23 @@ function clearFieldErrors() {
   ["name", "email", "whatsapp", "company", "segment_select", "segment_other", "consent"].forEach((field) => {
     setFieldError(field, "");
   });
+}
+
+function readLeadInputs(formElement) {
+  const leadData = Object.fromEntries(new FormData(formElement).entries());
+  state.lead = {
+    ...state.lead,
+    name: (leadData.name || "").trim(),
+    email: (leadData.email || "").trim(),
+    whatsapp: (leadData.whatsapp || "").trim(),
+    company: (leadData.company || "").trim(),
+    segment_select: leadData.segment_select || "",
+    segment_other: (leadData.segment_other || "").trim(),
+    cidade_uf: (leadData.cidade_uf || "").trim(),
+    website: (leadData.website || "").trim(),
+    consent: leadData.consent || "",
+  };
+  return state.lead;
 }
 
 function renderQuizStep() {
@@ -334,10 +362,10 @@ function renderResult() {
   resultView.innerHTML = `
     <h2>Seu resultado</h2>
     <div class="disc-grid">
-      <div><span>D</span><strong>${disc.D}%</strong></div>
-      <div><span>I</span><strong>${disc.I}%</strong></div>
-      <div><span>S</span><strong>${disc.S}%</strong></div>
-      <div><span>C</span><strong>${disc.C}%</strong></div>
+      <div><span class="disc-label">D - Dominante</span><strong>${disc.D}%</strong></div>
+      <div><span class="disc-label">I - Influente</span><strong>${disc.I}%</strong></div>
+      <div><span class="disc-label">S - Estável</span><strong>${disc.S}%</strong></div>
+      <div><span class="disc-label">C - Analítico</span><strong>${disc.C}%</strong></div>
     </div>
 
     <section class="card-soft profile-summary">
@@ -393,6 +421,9 @@ function renderResult() {
           <input required name="company" />
           <small id="error-company" class="field-error"></small>
         </label>
+        <label for="cidade_uf">Cidade/UF (opcional) — pra eu ajustar pro seu mercado local
+          <input id="cidade_uf" name="cidade_uf" placeholder="Ex.: Itumbiara/GO" />
+        </label>
         <label>Segmento
           <select required name="segment_select" id="segment-select">
             <option value="" disabled selected>Selecione...</option>
@@ -417,6 +448,22 @@ function renderResult() {
   const segmentOtherWrap = document.getElementById("segment-other-wrap");
   const segmentOtherInput = document.getElementById("segment-other");
   const whatsappInput = document.querySelector('[name="whatsapp"]');
+  const leadForm = document.getElementById("lead-form");
+
+  ["name", "email", "whatsapp", "company", "segment_other", "cidade_uf"].forEach((fieldName) => {
+    const field = leadForm.querySelector(`[name="${fieldName}"]`);
+    if (field) field.value = state.lead[fieldName] || "";
+  });
+  const consentInput = leadForm.querySelector('[name="consent"]');
+  if (consentInput) consentInput.checked = state.lead.consent === "sim";
+
+  if (state.lead.segment_select) {
+    segmentSelect.value = state.lead.segment_select;
+  }
+
+  const isOtherSelected = segmentSelect.value === "Outro (digitar)";
+  segmentOtherWrap.classList.toggle("hidden", !isOtherSelected);
+  segmentOtherInput.required = isOtherSelected;
 
   segmentSelect.addEventListener("change", () => {
     const isOther = segmentSelect.value === "Outro (digitar)";
@@ -436,7 +483,7 @@ function renderResult() {
     whatsappInput.value = [ddd ? `(${ddd})` : "", prefixo, sufixo].filter(Boolean).join(" ").trim();
   });
 
-  document.getElementById("lead-form").addEventListener("submit", submitLead);
+  leadForm.addEventListener("submit", submitLead);
 
   progressText.textContent = "Resultado";
   progressFill.style.width = "100%";
@@ -472,10 +519,9 @@ async function submitLead(event) {
 
   const feedback = document.getElementById("submit-feedback");
   const submitButton = document.getElementById("plan-submit");
-  const formData = new FormData(event.target);
-  const lead = Object.fromEntries(formData.entries());
+  const lead = readLeadInputs(event.target);
 
-  if (lead.website?.trim()) {
+  if (lead.website) {
     trackEvent("lead_submit_blocked_honeypot", {});
     feedback.textContent = "Recebido ✅ vou te enviar em breve.";
     submitButton.disabled = true;
@@ -486,8 +532,8 @@ async function submitLead(event) {
     ? (lead.segment_other || "").trim()
     : lead.segment_select;
 
-  const email = (lead.email || "").trim();
-  const whatsapp = (lead.whatsapp || "").trim();
+  const email = lead.email;
+  const whatsapp = lead.whatsapp;
   const whatsappDigits = whatsapp.replace(/\D/g, "");
   const hasValidEmail = !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const hasValidWhatsapp = !whatsapp || whatsappDigits.length >= 10;
@@ -531,11 +577,12 @@ async function submitLead(event) {
 
   const payload = {
     // contrato principal (documentado)
-    name: (lead.name || "").trim(),
+    name: lead.name,
     email,
     whatsapp,
-    company: lead.company.trim(),
+    company: lead.company,
     segment: finalSegment,
+    cidade_uf: state.lead.cidade_uf,
     consent: lead.consent,
     ranking_json: state.result.ranking_json,
     disc_pct: state.result.disc_pct,
@@ -553,8 +600,8 @@ async function submitLead(event) {
     group_timings_ms: state.groupTimingsMs,
 
     // chaves legadas (compatibilidade)
-    nome: (lead.name || "").trim(),
-    empresa: lead.company.trim(),
+    nome: lead.name,
+    empresa: lead.company,
     segmento: finalSegment,
     pct: state.result.disc_pct,
     behaviors_json: state.result.behaviors_scores,
