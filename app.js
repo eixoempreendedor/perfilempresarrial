@@ -163,6 +163,18 @@ function clearFieldErrors() {
   });
 }
 
+function setSubmitFeedback(feedbackEl, message, status = "info", meta = {}) {
+  if (!feedbackEl) return;
+  feedbackEl.textContent = message;
+  feedbackEl.dataset.status = status;
+  console.info("[submit-feedback]", {
+    status,
+    message,
+    ...meta,
+    timestamp: new Date().toISOString(),
+  });
+}
+
 function readLeadInputs(formElement) {
   const leadData = Object.fromEntries(new FormData(formElement).entries());
   state.lead = {
@@ -534,16 +546,25 @@ async function postLead(payload) {
     );
     return;
   } catch {
-    await fetchWithRetry(
-      SUBMIT_URL,
-      {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: serializedPayload,
-      },
-      { timeoutMs: 15000, retries: 1, acceptOpaqueResponse: true }
-    );
+    try {
+      await fetchWithRetry(
+        SUBMIT_URL,
+        {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: serializedPayload,
+        },
+        { timeoutMs: 15000, retries: 1, acceptOpaqueResponse: true }
+      );
+      return;
+    } catch {
+      const beaconPayload = new Blob([serializedPayload], { type: "text/plain;charset=utf-8" });
+      const beaconSent = typeof navigator.sendBeacon === "function" && navigator.sendBeacon(SUBMIT_URL, beaconPayload);
+      if (!beaconSent) {
+        throw new Error("Falha no envio");
+      }
+    }
   }
 }
 
@@ -573,7 +594,7 @@ async function submitLead(event) {
 
   if (lead.website) {
     trackEvent("lead_submit_blocked_honeypot", {});
-    feedback.textContent = "Recebido ✅ vou te enviar em breve.";
+    setSubmitFeedback(feedback, "Recebido ✅ vou te enviar em breve.", "success", { source: "honeypot" });
     submitButton.disabled = true;
     return;
   }
@@ -620,7 +641,7 @@ async function submitLead(event) {
   }
 
   if (hasError) {
-    feedback.textContent = "Corrija os campos destacados para continuar.";
+    setSubmitFeedback(feedback, "Corrija os campos destacados para continuar.", "warning", { reason: "validation" });
     trackEvent("lead_submit_validation_failed", { step: "result" });
     return;
   }
@@ -662,7 +683,7 @@ async function submitLead(event) {
     quizVersion: QUIZ_VERSION,
   };
 
-  feedback.textContent = "Enviando...";
+  setSubmitFeedback(feedback, "Enviando...", "info", { phase: "attempt" });
   trackEvent("lead_submit_attempt", {
     segment: finalSegment,
     hasEmail: Boolean(email),
@@ -672,7 +693,7 @@ async function submitLead(event) {
   try {
     await postLead(payload);
 
-    feedback.textContent = "Recebido ✅ vou te enviar em breve.";
+    setSubmitFeedback(feedback, "Recebido ✅ vou te enviar em breve.", "success", { source: "submit" });
     submitButton.disabled = true;
     localStorage.removeItem(PENDING_SUBMIT_KEY);
     trackEvent("lead_submit_success", { segment: finalSegment });
@@ -681,7 +702,12 @@ async function submitLead(event) {
     setTimeout(() => {
       void flushPendingSubmit();
     }, 15000);
-    feedback.textContent = "Não foi possível enviar agora. Tentamos novamente em instantes. Se persistir, atualize e tente de novo.";
+    setSubmitFeedback(
+      feedback,
+      "Não foi possível enviar agora. Tentamos novamente em instantes. Se persistir, atualize e tente de novo.",
+      "error",
+      { reason: "network_or_cors" }
+    );
     trackEvent("lead_submit_failed", { segment: finalSegment });
   }
 }
