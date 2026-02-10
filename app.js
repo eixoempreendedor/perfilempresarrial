@@ -81,10 +81,13 @@ let sortableInstance;
 function renderQuizStep() {
   const groupMeta = GROUPS[state.step];
   const groupItems = state.rankings[state.step];
+  const orientationQuestion = `${groupMeta.title.toLowerCase()}:`;
   quizView.innerHTML = `
-    <h1 class="quiz-title">Perfil do Dono</h1>
-    <h2>Grupo ${state.step + 1}</h2>
-    <p class="helper">${groupMeta.title}</p>
+    <h2 class="group-heading">Grupo ${state.step + 1}</h2>
+    <p class="group-orientation">
+      <span class="orientation-prefix">Como você age | se comporta | se sente</span>
+      <span class="orientation-question">${orientationQuestion}</span>
+    </p>
     <p class="order-hint">Topo = mais me identifico</p>
     <ul id="sortable-list" class="sortable-list">
       ${groupItems

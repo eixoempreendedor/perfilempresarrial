@@ -88,10 +88,26 @@ body {
 .subtitle, .helper { color: var(--muted); }
 .subtitle { margin: 8px 0 0; }
 
-.quiz-title {
-  margin: 0 0 12px;
-  font-size: clamp(1.5rem, 5vw, 2.1rem);
-  white-space: nowrap;
+.group-heading {
+  margin: 0 0 6px;
+  font-size: clamp(0.95rem, 2.7vw, 1.2rem);
+  font-weight: 700;
+}
+
+.group-orientation {
+  margin: 0 0 10px;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.orientation-prefix {
+  display: block;
+  font-size: clamp(0.98rem, 3.2vw, 1.18rem);
+}
+
+.orientation-question {
+  display: block;
+  font-size: clamp(0.98rem, 3.2vw, 1.18rem);
 }
 
 .order-hint {
@@ -99,6 +115,7 @@ body {
   font-size: 0.72rem;
   color: var(--muted);
   opacity: 0.95;
+  text-align: right;
 }
 
 .order-hint-bottom {
@@ -272,8 +289,13 @@ input, select {
     font-size: 0.63rem;
   }
 
-  .quiz-title {
-    font-size: 1.9rem;
+  .group-heading {
+    font-size: 0.95rem;
+  }
+
+  .orientation-prefix,
+  .orientation-question {
+    font-size: 1rem;
   }
 
   .order-hint {
