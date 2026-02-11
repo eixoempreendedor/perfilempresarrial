@@ -35,6 +35,7 @@ const HEADERS = [
   "referrer",
   "user_agent",
   "quiz_version",
+  "payload_json_text",
 ];
 
 function doOptions() {
@@ -96,6 +97,27 @@ function appendLeadToSheet_(payload) {
     referrer: findFirst_(payload, ["referrer"]),
     user_agent: findFirst_(payload, ["user_agent", "userAgent"]),
     quiz_version: findFirst_(payload, ["quiz_version", "quizVersion"]),
+    payload_json_text: buildPayloadJsonText_(payload, {
+      timestamp: findFirst_(payload, ["timestamp", "submitted_at"]) || new Date().toISOString(),
+      nome: findFirst_(payload, ["nome", "name"]),
+      email: findFirst_(payload, ["email"]),
+      whatsapp: findFirst_(payload, ["whatsapp", "phone"]),
+      empresa: findFirst_(payload, ["empresa", "company"]),
+      segmento: segmentoFinal,
+      cidade_uf: findFirst_(payload, ["cidade_uf", "cidadeUf", "city_uf"]),
+      primary: findFirst_(payload, ["primary"]),
+      secondary: findFirst_(payload, ["secondary"]),
+      pct_D: parseNumberOrBlank_(firstNonEmpty_(discPct.D, findFirst_(payload, ["pct_D", "pct_d", "disc_pct_d"]))),
+      pct_I: parseNumberOrBlank_(firstNonEmpty_(discPct.I, findFirst_(payload, ["pct_I", "pct_i", "disc_pct_i"]))),
+      pct_S: parseNumberOrBlank_(firstNonEmpty_(discPct.S, findFirst_(payload, ["pct_S", "pct_s", "disc_pct_s"]))),
+      pct_C: parseNumberOrBlank_(firstNonEmpty_(discPct.C, findFirst_(payload, ["pct_C", "pct_c", "disc_pct_c"]))),
+      answers_json: answersJson,
+      behaviors_scores_json: behaviorsScoresJson,
+      behaviors_top_json: behaviorsTopJson,
+      behaviors_bottom_json: behaviorsBottomJson,
+      consent: normalizeConsent_(findFirst_(payload, ["consent"])),
+      page_url: findFirst_(payload, ["page_url", "pageUrl"]),
+    }),
   };
 
   const headerMap = getHeaderMap_(sheet);
@@ -270,6 +292,15 @@ function buildAnswersJson_(payload) {
       findFirst_(payload, ["quiz_answers"]) ||
       null
   );
+}
+
+function buildPayloadJsonText_(payload, fallbackObj) {
+  const fromPayload = findFirst_(payload, ["payload_json_text", "payloadJsonText"]);
+  if (typeof fromPayload === "string" && fromPayload.trim()) {
+    return fromPayload;
+  }
+
+  return JSON.stringify(fallbackObj, null, 2);
 }
 
 function buildJsonOrString_(value) {

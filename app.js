@@ -962,6 +962,37 @@ async function submitLead(event) {
     return;
   }
 
+  const submittedAt = new Date().toISOString();
+  const answersJson = state.result.ranking_json;
+  const behaviorsScoresJson = state.result.behaviors_scores;
+  const behaviorsTopJson = state.result.behaviors_top.map((item) => item.name);
+  const behaviorsBottomJson = state.result.behaviors_bottom.map((item) => item.name);
+  const payloadJsonText = JSON.stringify(
+    {
+      timestamp: submittedAt,
+      nome: lead.name,
+      email,
+      whatsapp,
+      empresa: lead.company,
+      segmento: finalSegment,
+      cidade_uf: state.lead.cidade_uf,
+      primary: state.result.primary,
+      secondary: state.result.secondary,
+      pct_D: state.result.disc_pct.D,
+      pct_I: state.result.disc_pct.I,
+      pct_S: state.result.disc_pct.S,
+      pct_C: state.result.disc_pct.C,
+      answers_json: answersJson,
+      behaviors_scores_json: behaviorsScoresJson,
+      behaviors_top_json: behaviorsTopJson,
+      behaviors_bottom_json: behaviorsBottomJson,
+      consent: lead.consent,
+      page_url: window.location.href,
+    },
+    null,
+    2
+  );
+
   const payload = {
     // contrato principal (documentado)
     name: lead.name,
@@ -971,7 +1002,7 @@ async function submitLead(event) {
     segment: finalSegment,
     cidade_uf: state.lead.cidade_uf,
     consent: lead.consent,
-    ranking_json: state.result.ranking_json,
+    ranking_json: answersJson,
     disc_pct: state.result.disc_pct,
     pct_D: state.result.disc_pct.D,
     pct_I: state.result.disc_pct.I,
@@ -979,25 +1010,26 @@ async function submitLead(event) {
     pct_C: state.result.disc_pct.C,
     primary: state.result.primary,
     secondary: state.result.secondary,
-    behaviors_scores: state.result.behaviors_scores,
-    behaviors_top: state.result.behaviors_top.map((item) => item.name),
-    behaviors_bottom: state.result.behaviors_bottom.map((item) => item.name),
+    behaviors_scores: behaviorsScoresJson,
+    behaviors_top: behaviorsTopJson,
+    behaviors_bottom: behaviorsBottomJson,
     quiz_version: QUIZ_VERSION,
-    submitted_at: new Date().toISOString(),
+    submitted_at: submittedAt,
     page_url: window.location.href,
     referrer: document.referrer || "",
     user_agent: navigator.userAgent,
     quiz_events: state.events,
     group_timings_ms: state.groupTimingsMs,
+    payload_json_text: payloadJsonText,
 
     // chaves legadas (compatibilidade)
     nome: lead.name,
     empresa: lead.company,
     segmento: finalSegment,
     pct: state.result.disc_pct,
-    behaviors_json: state.result.behaviors_scores,
-    behaviorsTop: state.result.behaviors_top.map((item) => item.name),
-    behaviorsBottom: state.result.behaviors_bottom.map((item) => item.name),
+    behaviors_json: behaviorsScoresJson,
+    behaviorsTop: behaviorsTopJson,
+    behaviorsBottom: behaviorsBottomJson,
     pageUrl: window.location.href,
     userAgent: navigator.userAgent,
     quizVersion: QUIZ_VERSION,
