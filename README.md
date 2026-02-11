@@ -37,33 +37,13 @@ Como funciona:
 
 ### Upload opcional para Google Drive
 
-### Passo 1 — Apps Script aceitando payload do relatório
-
-Arquivo de exemplo pronto: `apps-script/Code.gs`.
-
-Fluxo de configuração:
-
-1. Abra seu projeto no Google Apps Script.
-2. Cole o conteúdo de `apps-script/Code.gs` no arquivo `Code.gs`.
-3. Faça o deploy como **Web app** (Execute as: *Me* / Access: *Anyone* ou *Anyone with link*).
-4. Copie a URL publicada e configure em `REPORT_UPLOAD_URL` no `config.js`.
-5. Mantenha `REPORT_FOLDER_ID` com a pasta de destino no Drive.
-
-O endpoint aceita dois tipos de payload:
-
-- **Relatório PDF** (quando vem `contentBase64` + `mimeType=application/pdf` + `fileName`): salva o arquivo no Drive e retorna `url` / `webViewLink`.
-- **Lead** (fallback): mantém compatibilidade e responde `ok: true`.
-
-No `config.js`, configure `REPORT_UPLOAD_URL` com a URL do seu endpoint (Apps Script/Webhook/API) e mantenha `REPORT_FOLDER_ID` com a pasta de destino no Drive:
+No `config.js`, configure `REPORT_UPLOAD_URL` com a URL do seu endpoint (Apps Script/Webhook/API):
 
 ```js
 export const REPORT_UPLOAD_URL = "https://...";
-export const REPORT_FOLDER_ID = "1_QyLaXtPS6eJuvkfbjYhY5NLy0-p6jnJ";
 ```
 
-Se configurado, após gerar o PDF o app envia `fileName`, `folderId`, `mimeType`, `contentBase64` e `meta` (nome, empresa, segmento, cidade, data e `folderId`).
-
-> Configuração atual do projeto: `REPORT_UPLOAD_URL = SUBMIT_URL` para facilitar o passo 1 de testes.
+Se configurado, após gerar o PDF o app envia `fileName`, `mimeType`, `contentBase64` e `meta` (nome, empresa, segmento, cidade e data).
 
 - Progresso com estimativa dinâmica de tempo restante.
 - Retomada de sessão via `localStorage` para evitar perda de progresso.

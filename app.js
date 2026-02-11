@@ -1,4 +1,4 @@
-import { BEHAVIORS, GROUPS, MAP, QUIZ_VERSION, REPORT_FOLDER_ID, REPORT_UPLOAD_URL, SEGMENTS, SUBMIT_URL } from "./config.js";
+import { BEHAVIORS, GROUPS, MAP, QUIZ_VERSION, REPORT_UPLOAD_URL, SEGMENTS, SUBMIT_URL } from "./config.js";
 
 const STORAGE_KEY = "perfil-do-dono-state";
 const PENDING_SUBMIT_KEY = `${STORAGE_KEY}-pending-submit`;
