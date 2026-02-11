@@ -452,9 +452,7 @@ function renderResult() {
         <label class="consent-line"><input type="checkbox" name="consent" value="sim" required /> Eu concordo em receber o plano personalizado e comunicações relacionadas.</label>
         <small id="error-consent" class="field-error"></small>
         <button id="plan-submit" class="btn primary full" type="submit">Quero meu plano personalizado</button>
-        <button id="generate-report" class="btn secondary full" type="button">Gerar relatório em PDF</button>
         <p id="submit-feedback" class="feedback"></p>
-        <p id="report-feedback" class="feedback"></p>
       </form>
     </section>
   `;
@@ -464,8 +462,6 @@ function renderResult() {
   const segmentOtherInput = document.getElementById("segment-other");
   const whatsappInput = document.querySelector('[name="whatsapp"]');
   const leadForm = document.getElementById("lead-form");
-  const reportButton = document.getElementById("generate-report");
-  const reportFeedback = document.getElementById("report-feedback");
 
   ["name", "email", "whatsapp", "company", "segment_other", "cidade_uf"].forEach((fieldName) => {
     const field = leadForm.querySelector(`[name="${fieldName}"]`);
@@ -501,9 +497,6 @@ function renderResult() {
   });
 
   leadForm.addEventListener("submit", submitLead);
-  reportButton.addEventListener("click", () => {
-    void generateAndDownloadReport(reportButton, reportFeedback, leadForm);
-  });
 
   progressText.textContent = "Resultado";
   progressFill.style.width = "100%";
