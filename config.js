@@ -5,7 +5,9 @@ export const QUIZ_VERSION = "perfil-do-dono-ranking-v1";
 
 // Opcional: endpoint para salvar PDF no Google Drive
 // Exemplo: Web App do Apps Script que recebe { fileName, mimeType, contentBase64, meta }
-export const REPORT_UPLOAD_URL = "";
+// Passo 1 (teste): usa o mesmo endpoint do Apps Script até separar rota exclusiva de upload
+export const REPORT_UPLOAD_URL = SUBMIT_URL;
+export const REPORT_FOLDER_ID = "1_QyLaXtPS6eJuvkfbjYhY5NLy0-p6jnJ";
 
 export const SEGMENTS = [
   "Restaurante / Food Service",

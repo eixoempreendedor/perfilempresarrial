@@ -776,6 +776,7 @@ async function uploadReportToDrive(blob, placeholders) {
   const fileName = `Relatorio-${(placeholders.NOME_EMPRESA || "empresa").replace(/\s+/g, "-")}-${formatDate().replace(/\//g, "")}.pdf`;
   const payload = {
     fileName,
+    folderId: REPORT_FOLDER_ID,
     mimeType: "application/pdf",
     contentBase64: await blobToBase64(blob),
     meta: {
@@ -784,6 +785,7 @@ async function uploadReportToDrive(blob, placeholders) {
       segment: placeholders.SEGMENTO,
       city: placeholders.CIDADE,
       generatedAt: placeholders.DATA,
+      folderId: REPORT_FOLDER_ID,
     },
   };
 
