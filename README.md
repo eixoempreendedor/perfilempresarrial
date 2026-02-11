@@ -46,6 +46,8 @@ export const REPORT_FOLDER_ID = "1_QyLaXtPS6eJuvkfbjYhY5NLy0-p6jnJ";
 
 Se configurado, após gerar o PDF o app envia `fileName`, `folderId`, `mimeType`, `contentBase64` e `meta` (nome, empresa, segmento, cidade, data e `folderId`).
 
+> Configuração atual do projeto: `REPORT_UPLOAD_URL = SUBMIT_URL` para facilitar o passo 1 de testes.
+
 - Progresso com estimativa dinâmica de tempo restante.
 - Retomada de sessão via `localStorage` para evitar perda de progresso.
 - Eventos de funil (início, visualização/conclusão de grupos, resultado, submit).
