@@ -63,6 +63,7 @@ No envio final, o app faz `fetch POST` para `SUBMIT_URL` com JSON contendo:
   - `name`, `email`, `whatsapp`, `company`, `segment`, `consent`
   - `ranking_json`, `disc_pct`, `primary`, `secondary`
   - `behaviors_scores`, `behaviors_top`, `behaviors_bottom`
+  - `payload_json_text` (texto único em JSON formatado para a planilha)
   - `quiz_version`, `submitted_at`
   - `page_url`, `referrer`, `user_agent`
   - `quiz_events`, `group_timings_ms`
