@@ -42,6 +42,7 @@ function doPost(e) {
   }
 
   const segmentoFinal = buildSegmentoFinal_(payload);
+  const discPct = extractDiscPct_(payload);
   const answersJson = buildAnswersJson_(payload);
   const behaviorsScoresJson = buildJsonOrString_(
     findFirst_(payload, ['behaviors_scores', 'behaviors_json'])
@@ -63,10 +64,10 @@ function doPost(e) {
     cidade_uf: findFirst_(payload, ['cidade_uf', 'cidadeUf', 'city_uf']),
     primary: findFirst_(payload, ['primary']),
     secondary: findFirst_(payload, ['secondary']),
-    pct_D: parseNumberOrBlank_(findFirst_(payload, ['pct_D', 'pct_d', 'disc_pct_d'])),
-    pct_I: parseNumberOrBlank_(findFirst_(payload, ['pct_I', 'pct_i', 'disc_pct_i'])),
-    pct_S: parseNumberOrBlank_(findFirst_(payload, ['pct_S', 'pct_s', 'disc_pct_s'])),
-    pct_C: parseNumberOrBlank_(findFirst_(payload, ['pct_C', 'pct_c', 'disc_pct_c'])),
+    pct_D: parseNumberOrBlank_(discPct.D || findFirst_(payload, ['pct_D', 'pct_d', 'disc_pct_d'])),
+    pct_I: parseNumberOrBlank_(discPct.I || findFirst_(payload, ['pct_I', 'pct_i', 'disc_pct_i'])),
+    pct_S: parseNumberOrBlank_(discPct.S || findFirst_(payload, ['pct_S', 'pct_s', 'disc_pct_s'])),
+    pct_C: parseNumberOrBlank_(discPct.C || findFirst_(payload, ['pct_C', 'pct_c', 'disc_pct_c'])),
     answers_json: answersJson,
     behaviors_scores_json: behaviorsScoresJson,
     behaviors_top_json: behaviorsTopJson,
@@ -95,6 +96,34 @@ function doPost(e) {
   notifyOwner_(rowObj);
 
   return jsonOutput_({ ok: true });
+}
+
+function extractDiscPct_(payload) {
+  const rawDiscPct = findFirst_(payload, ['disc_pct', 'pct']);
+
+  if (!rawDiscPct) {
+    return {};
+  }
+
+  let parsed = rawDiscPct;
+  if (typeof rawDiscPct === 'string') {
+    try {
+      parsed = JSON.parse(rawDiscPct);
+    } catch (_err) {
+      return {};
+    }
+  }
+
+  if (typeof parsed !== 'object' || parsed === null) {
+    return {};
+  }
+
+  return {
+    D: findFirst_(parsed, ['D', 'd']),
+    I: findFirst_(parsed, ['I', 'i']),
+    S: findFirst_(parsed, ['S', 's']),
+    C: findFirst_(parsed, ['C', 'c']),
+  };
 }
 
 function ensureHeaders_(sheet) {
