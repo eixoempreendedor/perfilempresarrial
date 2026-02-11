@@ -1,4 +1,6 @@
 const OWNER_EMAIL = 'OWNER_EMAIL';
+const SPREADSHEET_ID = '';
+const SHEET_NAME = '';
 
 const HEADERS = [
   'timestamp',
@@ -30,7 +32,7 @@ function doGet() {
 }
 
 function doPost(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const sheet = getTargetSheet_();
   ensureHeaders_(sheet);
 
   let payload = {};
@@ -165,6 +167,19 @@ function firstDefined_() {
     }
   }
   return '';
+}
+
+
+function getTargetSheet_() {
+  const ss = SPREADSHEET_ID
+    ? SpreadsheetApp.openById(SPREADSHEET_ID)
+    : SpreadsheetApp.getActiveSpreadsheet();
+
+  if (SHEET_NAME) {
+    return ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
+  }
+
+  return ss.getActiveSheet();
 }
 
 function ensureHeaders_(sheet) {

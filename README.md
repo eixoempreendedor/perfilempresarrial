@@ -56,3 +56,12 @@ No envio final, o app faz `fetch POST` para `SUBMIT_URL` com JSON contendo:
 - compatibilidade legada:
   - `nome`, `empresa`, `segmento`, `pct`, `behaviors_json`
   - `behaviorsTop`, `behaviorsBottom`, `pageUrl`, `userAgent`, `quizVersion`
+
+## Troubleshooting (DISC vazio na planilha)
+
+Se `pct_D`, `pct_I`, `pct_S`, `pct_C` continuarem vazios:
+
+1. Garanta que o Apps Script publicado é a versão mais recente (Deploy → Manage deployments → Edit → New version).
+2. No `Código.js`, configure `SPREADSHEET_ID` e `SHEET_NAME` para evitar gravar na aba errada.
+3. Confira se `SUBMIT_URL` no `config.js` aponta para o deployment atual do Apps Script.
+
