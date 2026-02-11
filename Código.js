@@ -15,6 +15,9 @@ const HEADERS = [
   'pct_S',
   'pct_C',
   'answers_json',
+  'behaviors_scores_json',
+  'behaviors_top_json',
+  'behaviors_bottom_json',
   'consent',
   'page_url',
   'referrer',
@@ -40,6 +43,15 @@ function doPost(e) {
 
   const segmentoFinal = buildSegmentoFinal_(payload);
   const answersJson = buildAnswersJson_(payload);
+  const behaviorsScoresJson = buildJsonOrString_(
+    findFirst_(payload, ['behaviors_scores', 'behaviors_json'])
+  );
+  const behaviorsTopJson = buildJsonOrString_(
+    findFirst_(payload, ['behaviors_top', 'behaviorsTop'])
+  );
+  const behaviorsBottomJson = buildJsonOrString_(
+    findFirst_(payload, ['behaviors_bottom', 'behaviorsBottom'])
+  );
 
   const rowObj = {
     timestamp: findFirst_(payload, ['timestamp', 'submitted_at']) || new Date().toISOString(),
@@ -56,6 +68,9 @@ function doPost(e) {
     pct_S: parseNumberOrBlank_(findFirst_(payload, ['pct_S', 'pct_s', 'disc_pct_s'])),
     pct_C: parseNumberOrBlank_(findFirst_(payload, ['pct_C', 'pct_c', 'disc_pct_c'])),
     answers_json: answersJson,
+    behaviors_scores_json: behaviorsScoresJson,
+    behaviors_top_json: behaviorsTopJson,
+    behaviors_bottom_json: behaviorsBottomJson,
     consent: normalizeConsent_(findFirst_(payload, ['consent'])),
     page_url: findFirst_(payload, ['page_url', 'pageUrl']),
     referrer: findFirst_(payload, ['referrer']),
@@ -127,23 +142,26 @@ function buildSegmentoFinal_(payload) {
 }
 
 function buildAnswersJson_(payload) {
-  const rawAnswers =
+  return buildJsonOrString_(
     findFirst_(payload, ['answers_json']) ||
     findFirst_(payload, ['ranking_json']) ||
     findFirst_(payload, ['answers']) ||
     findFirst_(payload, ['quiz_answers']) ||
-    null;
+    null
+  );
+}
 
-  if (!rawAnswers) {
+function buildJsonOrString_(value) {
+  if (!value) {
     return '';
   }
 
-  if (typeof rawAnswers === 'string') {
-    return rawAnswers;
+  if (typeof value === 'string') {
+    return value;
   }
 
   try {
-    return JSON.stringify(rawAnswers);
+    return JSON.stringify(value);
   } catch (_err) {
     return '';
   }
