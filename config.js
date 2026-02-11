@@ -1,5 +1,6 @@
 // config.js
 export const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxRgYjpKEQJiNoNdQIFxJ0uYl2maf9i2gnx8X7b7SIC0iBJ1u-UD_pCSn1Q77BwzZD-/exec";
+
 export const QUIZ_VERSION = "perfil-do-dono-ranking-v1";
 
 export const SEGMENTS = [
