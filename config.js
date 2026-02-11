@@ -3,6 +3,11 @@ export const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxRgYjpKEQJiN
 
 export const QUIZ_VERSION = "perfil-do-dono-ranking-v1";
 
+// Opcional: endpoint para salvar PDF no Google Drive
+// Exemplo: Web App do Apps Script que recebe { fileName, mimeType, contentBase64, meta }
+export const REPORT_UPLOAD_URL = "";
+export const REPORT_FOLDER_ID = "1_QyLaXtPS6eJuvkfbjYhY5NLy0-p6jnJ";
+
 export const SEGMENTS = [
   "Restaurante / Food Service",
   "Cafeteria / Padaria",
