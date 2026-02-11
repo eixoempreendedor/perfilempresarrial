@@ -26,14 +26,7 @@ Edite `config.js` para ajustar:
 
 ## Geração de relatório PDF
 
-O app agora possui um botão **"Gerar relatório em PDF"** na tela de resultado.
-
-Como funciona:
-
-- monta placeholders dinâmicos com os dados do quiz + formulário final;
-- gera um template de 12 páginas em A4 no navegador;
-- renderiza página por página com `html2canvas` e exporta com `jsPDF`;
-- baixa o arquivo automaticamente no dispositivo do usuário.
+O fluxo de geração de PDF foi temporariamente removido da interface enquanto preparamos a integração via Google Docs.
 
 ### Upload opcional para Google Drive
 
