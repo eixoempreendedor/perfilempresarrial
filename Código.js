@@ -66,10 +66,10 @@ function doPost(e) {
     cidade_uf: findFirst_(payload, ['cidade_uf', 'cidadeUf', 'city_uf']),
     primary: findFirst_(payload, ['primary']),
     secondary: findFirst_(payload, ['secondary']),
-    pct_D: parseNumberOrBlank_(firstDefined_(discPct.D, findFirst_(payload, ['pct_D', 'pct_d', 'disc_pct_d']))),
-    pct_I: parseNumberOrBlank_(firstDefined_(discPct.I, findFirst_(payload, ['pct_I', 'pct_i', 'disc_pct_i']))),
-    pct_S: parseNumberOrBlank_(firstDefined_(discPct.S, findFirst_(payload, ['pct_S', 'pct_s', 'disc_pct_s']))),
-    pct_C: parseNumberOrBlank_(firstDefined_(discPct.C, findFirst_(payload, ['pct_C', 'pct_c', 'disc_pct_c']))),
+    pct_D: parseNumberOrBlank_(discPct.D || findFirst_(payload, ['pct_D', 'pct_d', 'disc_pct_d'])),
+    pct_I: parseNumberOrBlank_(discPct.I || findFirst_(payload, ['pct_I', 'pct_i', 'disc_pct_i'])),
+    pct_S: parseNumberOrBlank_(discPct.S || findFirst_(payload, ['pct_S', 'pct_s', 'disc_pct_s'])),
+    pct_C: parseNumberOrBlank_(discPct.C || findFirst_(payload, ['pct_C', 'pct_c', 'disc_pct_c'])),
     answers_json: answersJson,
     behaviors_scores_json: behaviorsScoresJson,
     behaviors_top_json: behaviorsTopJson,
@@ -101,85 +101,31 @@ function doPost(e) {
 }
 
 function extractDiscPct_(payload) {
-  const candidates = [
-    findFirst_(payload, ['disc_pct', 'pct', 'disc', 'discPct']),
-    findFirst_(payload, ['disc_json', 'disc_pct_json']),
-  ];
+  const rawDiscPct = findFirst_(payload, ['disc_pct', 'pct']);
 
-  for (let i = 0; i < candidates.length; i += 1) {
-    const parsed = parseMaybeJsonObject_(candidates[i]);
-    if (!parsed) {
-      continue;
-    }
-
-    const d = findFirst_(parsed, ['D', 'd']);
-    const iVal = findFirst_(parsed, ['I', 'i']);
-    const s = findFirst_(parsed, ['S', 's']);
-    const c = findFirst_(parsed, ['C', 'c']);
-
-    if (d !== '' || iVal !== '' || s !== '' || c !== '') {
-      return { D: d, I: iVal, S: s, C: c };
-    }
+  if (!rawDiscPct) {
+    return {};
   }
 
-  return {};
-}
-
-function parseMaybeJsonObject_(value) {
-  if (!value) {
-    return null;
-  }
-
-  if (typeof value === 'object' && value !== null) {
-    return value;
-  }
-
-  if (typeof value !== 'string') {
-    return null;
-  }
-
-  let parsed = value;
-  for (let i = 0; i < 2; i += 1) {
-    if (typeof parsed !== 'string') {
-      break;
-    }
-
-    const trimmed = parsed.trim();
-    if (!trimmed || ((trimmed[0] !== '{' || trimmed[trimmed.length - 1] !== '}') && (trimmed[0] !== '"'))) {
-      return null;
-    }
-
+  let parsed = rawDiscPct;
+  if (typeof rawDiscPct === 'string') {
     try {
-      parsed = JSON.parse(trimmed);
+      parsed = JSON.parse(rawDiscPct);
     } catch (_err) {
-      return null;
+      return {};
     }
   }
 
-  return typeof parsed === 'object' && parsed !== null ? parsed : null;
-}
-
-function firstDefined_() {
-  for (let i = 0; i < arguments.length; i += 1) {
-    const val = arguments[i];
-    if (val !== undefined && val !== null && val !== '') {
-      return val;
-    }
-  }
-  return '';
-}
-
-
-function getTargetSheet_() {
-  const ss = SPREADSHEET_ID
-    ? SpreadsheetApp.openById(SPREADSHEET_ID)
-    : SpreadsheetApp.getActiveSpreadsheet();
-
-  if (SHEET_NAME) {
-    return ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
+  if (typeof parsed !== 'object' || parsed === null) {
+    return {};
   }
 
-  return ss.getActiveSheet();
+  return {
+    D: findFirst_(parsed, ['D', 'd']),
+    I: findFirst_(parsed, ['I', 'i']),
+    S: findFirst_(parsed, ['S', 's']),
+    C: findFirst_(parsed, ['C', 'c']),
+  };
 }
 
 function ensureHeaders_(sheet) {
