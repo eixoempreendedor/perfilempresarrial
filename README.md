@@ -37,6 +37,23 @@ Como funciona:
 
 ### Upload opcional para Google Drive
 
+### Passo 1 — Apps Script aceitando payload do relatório
+
+Arquivo de exemplo pronto: `apps-script/Code.gs`.
+
+Fluxo de configuração:
+
+1. Abra seu projeto no Google Apps Script.
+2. Cole o conteúdo de `apps-script/Code.gs` no arquivo `Code.gs`.
+3. Faça o deploy como **Web app** (Execute as: *Me* / Access: *Anyone* ou *Anyone with link*).
+4. Copie a URL publicada e configure em `REPORT_UPLOAD_URL` no `config.js`.
+5. Mantenha `REPORT_FOLDER_ID` com a pasta de destino no Drive.
+
+O endpoint aceita dois tipos de payload:
+
+- **Relatório PDF** (quando vem `contentBase64` + `mimeType=application/pdf` + `fileName`): salva o arquivo no Drive e retorna `url` / `webViewLink`.
+- **Lead** (fallback): mantém compatibilidade e responde `ok: true`.
+
 No `config.js`, configure `REPORT_UPLOAD_URL` com a URL do seu endpoint (Apps Script/Webhook/API) e mantenha `REPORT_FOLDER_ID` com a pasta de destino no Drive:
 
 ```js
